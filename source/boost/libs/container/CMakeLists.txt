@@ -37,3 +37,8 @@ target_link_libraries( boost_container
         Boost::static_assert
         Boost::type_traits
 )
+
+if (WIN32 AND BUILD_SHARED_LIBS)
+    set_target_properties (boost_container PROPERTIES
+        COMPILE_FLAGS "-DDLMALLOC_EXPORT=__declspec(dllexport)")
+endif ()

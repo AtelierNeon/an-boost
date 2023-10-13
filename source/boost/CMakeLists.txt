@@ -11,4 +11,14 @@ set(BOOST_SUPERPROJECT_SOURCE_DIR ${PROJECT_SOURCE_DIR})
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/tools/cmake/include)
 
+option(BOOST_WITH_SHARED_LIBRARIES "Build shared version of the Boost libraries." OFF)
+option(BOOST_WITHOUT_APPS "Build Boost without apps." OFF)
+
+set(BOOST_ENABLE_CMAKE ON)
+if(BOOST_WITH_SHARED_LIBRARIES)
+  set(BUILD_SHARED_LIBS ON)
+else()
+  set(BUILD_SHARED_LIBS OFF)
+endif()
+
 include(BoostRoot)

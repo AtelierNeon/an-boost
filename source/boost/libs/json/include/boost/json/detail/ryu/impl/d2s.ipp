@@ -46,7 +46,7 @@
 // Let's do the same for now.
 #if defined(__SIZEOF_INT128__) && !defined(_MSC_VER) && !defined(RYU_ONLY_64_BIT_OPS)
 #define BOOST_JSON_RYU_HAS_UINT128
-#elif defined(_MSC_VER) && !defined(RYU_ONLY_64_BIT_OPS) && defined(_M_X64)
+#elif defined(_MSC_VER) && !defined(RYU_ONLY_64_BIT_OPS) && defined(_M_X64) && !defined(_M_ARM64EC)
 #define BOOST_JSON_RYU_HAS_64_BIT_INTRINSICS
 #endif
 

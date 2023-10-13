@@ -21,6 +21,7 @@ endif()
 set(BOOST_INSTALL_LAYOUT ${__boost_default_layout} CACHE STRING "Installation layout (versioned, tagged, or system)")
 set_property(CACHE BOOST_INSTALL_LAYOUT PROPERTY STRINGS versioned tagged system)
 
+set(BOOST_INSTALL_BINDIR "${CMAKE_INSTALL_BINDIR}" CACHE STRING "Installation directory for binary files")
 set(BOOST_INSTALL_LIBDIR "${CMAKE_INSTALL_LIBDIR}" CACHE STRING "Installation directory for library files")
 set(BOOST_INSTALL_CMAKEDIR "${BOOST_INSTALL_LIBDIR}/cmake" CACHE STRING "Installation directory for CMake configuration files")
 set(BOOST_INSTALL_INCLUDEDIR "${CMAKE_INSTALL_INCLUDEDIR}" CACHE STRING "Installation directory for header files")
@@ -220,7 +221,10 @@ function(boost_install_target)
 
   set(CONFIG_INSTALL_DIR "${BOOST_INSTALL_CMAKEDIR}/${LIB}-${__VERSION}")
 
-  install(TARGETS ${LIB} EXPORT ${LIB}-targets DESTINATION ${BOOST_INSTALL_LIBDIR})
+  install(TARGETS ${LIB} EXPORT ${LIB}-targets
+    RUNTIME DESTINATION ${BOOST_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${BOOST_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${BOOST_INSTALL_LIBDIR})
 
   if(WIN32 AND TYPE STREQUAL "SHARED_LIBRARY")
 
