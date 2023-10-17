@@ -1,3 +1,92 @@
+Version 318:
+
+* Add a Boost-friendly subproject case to CMakeLists.
+* Remove use of POSIX-only constant.
+
+--------------------------------------------------------------------------------
+
+Version 317:
+
+* Remove travis CI.
+* Fix Drone CI script.
+* Add example of reading large response body.
+
+--------------------------------------------------------------------------------
+
+Version 316:
+
+* Disable GHA CI for clang-9.
+* Update example root certificates.
+
+--------------------------------------------------------------------------------
+
+Version 315:
+
+* Documentation uses docca jam module.
+
+--------------------------------------------------------------------------------
+
+Version 314:
+
+* WebSocket test is deterministic.
+* Add missing compilers to GHA script.
+
+--------------------------------------------------------------------------------
+
+Version 313:
+
+* Fix incorrect websocket test ordering.
+* Fix missing check for error code after header is parsed.
+* Fix case where inflated content is larger than the out buffer.
+
+--------------------------------------------------------------------------------
+
+Version 312:
+
+* Enable Github Actions CI.
+
+--------------------------------------------------------------------------------
+
+Version 311:
+
+* Fix warning in http-server-fast.
+* Parenthesise all uses of min() and max().
+* Extend Drone MSVC tests.
+* Fix MSVC build error.
+
+--------------------------------------------------------------------------------
+
+Version 310:
+
+* Update Release Notes.
+
+--------------------------------------------------------------------------------
+
+Version 309:
+
+* Extra logic error detection in http parser.
+* Move Windows CI to Drone.
+
+--------------------------------------------------------------------------------
+
+Version 308:
+
+* Fix compiler warning in WebSSocket async shutdown.
+* Remove Travis CI status.
+* Repoint B2 refs to new non-boostorg home.
+* Limit async_write instantiations in websocket ops.
+* Add Drone CI status.
+
+--------------------------------------------------------------------------------
+
+Version 307:
+
+* Add executor rebind to test::stream.
+* Remove floating point arithmetic requirement.
+* Add `cxxstd` to json field.
+
+--------------------------------------------------------------------------------
+
 Version 306:
 
 * Revert removal of lowest_layer_type from test stream.

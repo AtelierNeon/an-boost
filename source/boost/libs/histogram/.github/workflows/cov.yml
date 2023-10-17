@@ -8,15 +8,15 @@ on:
     paths-ignore:
       - 'doc/**'
       - 'examples/**'
-      - 'tools/**'
       - '*.md'
 
 env:
   B2_OPTS: -q -j2 warnings-as-errors=on
+  GCC_VERSION: 11
 
 jobs:
   cov:
-    runs-on: ubuntu-latest
+    runs-on: macos-10.15
     steps:
     - uses: actions/checkout@v2
     - name: Fetch Boost superproject
@@ -42,20 +42,20 @@ jobs:
         ./b2 headers
 
         # simulate bundled boost by moving the headers instead of symlinking
-        rm -rf boost/histogram.pp boost/histogram
+        rm -rf boost/histogram*
         mv -f libs/histogram/include/boost/* boost
 
-    - name: Test gcc-8 cxxstd=latest coverage=on
+    - name: Test cxxstd=latest coverage=on
       run: |
         cd libs/histogram
 
         # don't compile examples in coverage build, coverage must come from tests alone
-        ../../b2 $B2_OPTS toolset=gcc-8 cxxstd=latest coverage=on test//all
+        ../../b2 $B2_OPTS toolset=gcc-${GCC_VERSION} cxxstd=latest coverage=on test//all
 
     - name: Process coverage data
       run: |
         cd libs/histogram
-        GCOV=gcov-8 tools/cov.sh
+        GCOV=gcov-${GCC_VERSION} tools/cov.py
 
     - uses: coverallsapp/github-action@v1.1.2
       with:

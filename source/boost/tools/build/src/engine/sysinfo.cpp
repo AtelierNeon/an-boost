@@ -1,6 +1,6 @@
 /*  Copyright 2019 Rene Rivera
  *  Distributed under the Boost Software License, Version 1.0.
- *  (See accompanying file LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt)
+ *  (See accompanying file LICENSE.txt or https://www.bfgroup.xyz/b2/LICENSE.txt)
  */
 
 #include "sysinfo.h"
@@ -18,7 +18,7 @@
 #include <unistd.h>
 #endif
 
-#if defined(OS_LINUX)
+#if defined(OS_LINUX) || defined(__GLIBC__)
 // Need to define this in case it's not as that's the only way to get the
 // sched_* APIs.
 #ifndef _GNU_SOURCE

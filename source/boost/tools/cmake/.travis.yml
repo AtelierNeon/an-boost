@@ -1,4 +1,4 @@
-# Copyright 2016-2019 Peter Dimov
+# Copyright 2016-2021 Peter Dimov
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
@@ -24,31 +24,48 @@ matrix:
 
   include:
 
-    - env: LIB=assert COMMENT=trusty
+    - env: LIB=assert
       dist: trusty
       compiler: g++
 
-    - env: LIB=assert COMMENT=trusty
+    - env: LIB=assert
       dist: trusty
       compiler: clang++
 
-    - env: LIB=assert COMMENT=xenial
+    - env: LIB=assert
       dist: xenial
       compiler: g++
 
-    - env: LIB=assert COMMENT=xenial
+    - env: LIB=assert
       dist: xenial
       compiler: clang++
 
-    - env: LIB=assert COMMENT=bionic
+    - env: LIB=assert
       dist: bionic
       compiler: g++
 
-    - env: LIB=assert COMMENT=bionic
+    - env: LIB=assert
       dist: bionic
       compiler: clang++
 
     - env: LIB=assert
+      dist: focal
+      compiler: g++
+
+    - env: LIB=assert
+      dist: focal
+      compiler: clang++
+
+    - env: LIB=assert
+      os: osx
+
+    - env: LIB=mp11
+      compiler: g++
+
+    - env: LIB=mp11
+      compiler: clang++
+
+    - env: LIB=mp11
       os: osx
 
     - env: LIB=timer
@@ -74,7 +91,8 @@ matrix:
         - cd tools/cmake/test/boost_test
         - mkdir __build__ && cd __build__
         - cmake -DBoost_VERBOSE=ON ..
-        - ctest --output-on-failure
+        - cmake --build . -j 3 --target tests
+        - ctest --output-on-failure -j 3
 
     - env: TEST_BOOST_FETCH=1
       install: true
@@ -97,6 +115,7 @@ matrix:
 
     - env: TEST_BOOST_INSTALL=1 LIB=assert
       script:
+        - pip install --user cmake
         - mkdir __build__ && cd __build__
         - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DBOOST_ENABLE_CMAKE=1 -DBoost_VERBOSE=ON -DBOOST_INCLUDE_LIBRARIES=${BOOST_INCLUDE_LIBRARIES:-$LIB} ${BOOST_INSTALL_LAYOUT:+-DBOOST_INSTALL_LAYOUT=$BOOST_INSTALL_LAYOUT} ${BUILD_SHARED_LIBS:+-DBUILD_SHARED_LIBS=$BUILD_SHARED_LIBS} ..
         - cmake --build . --target install
@@ -107,6 +126,7 @@ matrix:
 
     - env: TEST_BOOST_INSTALL=1 LIB=assert BOOST_INSTALL_LAYOUT=tagged
       script:
+        - pip install --user cmake
         - mkdir __build__ && cd __build__
         - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DBOOST_ENABLE_CMAKE=1 -DBoost_VERBOSE=ON -DBOOST_INCLUDE_LIBRARIES=${BOOST_INCLUDE_LIBRARIES:-$LIB} ${BOOST_INSTALL_LAYOUT:+-DBOOST_INSTALL_LAYOUT=$BOOST_INSTALL_LAYOUT} ${BUILD_SHARED_LIBS:+-DBUILD_SHARED_LIBS=$BUILD_SHARED_LIBS} ..
         - cmake --build . --target install
@@ -117,6 +137,7 @@ matrix:
 
     - env: TEST_BOOST_INSTALL=1 LIB=assert BOOST_INSTALL_LAYOUT=versioned
       script:
+        - pip install --user cmake
         - mkdir __build__ && cd __build__
         - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DBOOST_ENABLE_CMAKE=1 -DBoost_VERBOSE=ON -DBOOST_INCLUDE_LIBRARIES=${BOOST_INCLUDE_LIBRARIES:-$LIB} ${BOOST_INSTALL_LAYOUT:+-DBOOST_INSTALL_LAYOUT=$BOOST_INSTALL_LAYOUT} ${BUILD_SHARED_LIBS:+-DBUILD_SHARED_LIBS=$BUILD_SHARED_LIBS} ..
         - cmake --build . --target install
@@ -158,11 +179,70 @@ matrix:
         - cmake --build .
         - cmake --build . --target check
 
+    - env: TEST_BOOST_INSTALL=1 LIB=timer
+      script:
+        - pip install --user cmake
+        - which cmake
+        - cmake --version
+        - mkdir __build__ && cd __build__
+        - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DBOOST_ENABLE_CMAKE=1 -DBoost_VERBOSE=ON -DBOOST_INCLUDE_LIBRARIES=${BOOST_INCLUDE_LIBRARIES:-$LIB} ${BOOST_INSTALL_LAYOUT:+-DBOOST_INSTALL_LAYOUT=$BOOST_INSTALL_LAYOUT} ${BUILD_SHARED_LIBS:+-DBUILD_SHARED_LIBS=$BUILD_SHARED_LIBS} ..
+        - cmake --build . --target install
+        - cd ../tools/cmake/test/$LIB && mkdir __build__ && cd __build__
+        - cmake -DCMAKE_INSTALL_PREFIX=~/.local ..
+        - cmake --build .
+        - cmake --build . --target check
+
+    - env: TEST_BOOST_INSTALL=1 LIB=timer BOOST_INSTALL_LAYOUT=tagged BUILD_SHARED_LIBS=ON
+      script:
+        - pip install --user cmake
+        - which cmake
+        - cmake --version
+        - mkdir __build__ && cd __build__
+        - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DBOOST_ENABLE_CMAKE=1 -DBoost_VERBOSE=ON -DBOOST_INCLUDE_LIBRARIES=${BOOST_INCLUDE_LIBRARIES:-$LIB} ${BOOST_INSTALL_LAYOUT:+-DBOOST_INSTALL_LAYOUT=$BOOST_INSTALL_LAYOUT} ${BUILD_SHARED_LIBS:+-DBUILD_SHARED_LIBS=$BUILD_SHARED_LIBS} ..
+        - cmake --build . --target install
+        - cd ../tools/cmake/test/$LIB && mkdir __build__ && cd __build__
+        - cmake -DCMAKE_INSTALL_PREFIX=~/.local ..
+        - cmake --build .
+        - cmake --build . --target check
+
     - env: TEST_BOOST_INSTALL=1 LIB=timer BOOST_INSTALL_LAYOUT=versioned
       script:
         - pip install --user cmake
         - which cmake
         - cmake --version
+        - mkdir __build__ && cd __build__
+        - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DBOOST_ENABLE_CMAKE=1 -DBoost_VERBOSE=ON -DBOOST_INCLUDE_LIBRARIES=${BOOST_INCLUDE_LIBRARIES:-$LIB} ${BOOST_INSTALL_LAYOUT:+-DBOOST_INSTALL_LAYOUT=$BOOST_INSTALL_LAYOUT} ${BUILD_SHARED_LIBS:+-DBUILD_SHARED_LIBS=$BUILD_SHARED_LIBS} ..
+        - cmake --build . --target install
+        - cd ../tools/cmake/test/$LIB && mkdir __build__ && cd __build__
+        - cmake -DCMAKE_INSTALL_PREFIX=~/.local ..
+        - cmake --build .
+        - cmake --build . --target check
+
+    - env: TEST_BOOST_INSTALL=1 LIB=iostreams
+      script:
+        - pip install --user cmake
+        - mkdir __build__ && cd __build__
+        - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DBOOST_ENABLE_CMAKE=1 -DBoost_VERBOSE=ON -DBOOST_INCLUDE_LIBRARIES=${BOOST_INCLUDE_LIBRARIES:-$LIB} ${BOOST_INSTALL_LAYOUT:+-DBOOST_INSTALL_LAYOUT=$BOOST_INSTALL_LAYOUT} ${BUILD_SHARED_LIBS:+-DBUILD_SHARED_LIBS=$BUILD_SHARED_LIBS} ..
+        - cmake --build . --target install
+        - cd ../tools/cmake/test/$LIB && mkdir __build__ && cd __build__
+        - cmake -DCMAKE_INSTALL_PREFIX=~/.local ..
+        - cmake --build .
+        - cmake --build . --target check
+
+    - env: TEST_BOOST_INSTALL=1 LIB=iostreams BOOST_INSTALL_LAYOUT=tagged BUILD_SHARED_LIBS=ON
+      script:
+        - pip install --user cmake
+        - mkdir __build__ && cd __build__
+        - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DBOOST_ENABLE_CMAKE=1 -DBoost_VERBOSE=ON -DBOOST_INCLUDE_LIBRARIES=${BOOST_INCLUDE_LIBRARIES:-$LIB} ${BOOST_INSTALL_LAYOUT:+-DBOOST_INSTALL_LAYOUT=$BOOST_INSTALL_LAYOUT} ${BUILD_SHARED_LIBS:+-DBUILD_SHARED_LIBS=$BUILD_SHARED_LIBS} ..
+        - cmake --build . --target install
+        - cd ../tools/cmake/test/$LIB && mkdir __build__ && cd __build__
+        - cmake -DCMAKE_INSTALL_PREFIX=~/.local ..
+        - cmake --build .
+        - cmake --build . --target check
+
+    - env: TEST_BOOST_INSTALL=1 LIB=iostreams BOOST_INSTALL_LAYOUT=versioned
+      script:
+        - pip install --user cmake
         - mkdir __build__ && cd __build__
         - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DBOOST_ENABLE_CMAKE=1 -DBoost_VERBOSE=ON -DBOOST_INCLUDE_LIBRARIES=${BOOST_INCLUDE_LIBRARIES:-$LIB} ${BOOST_INSTALL_LAYOUT:+-DBOOST_INSTALL_LAYOUT=$BOOST_INSTALL_LAYOUT} ${BUILD_SHARED_LIBS:+-DBUILD_SHARED_LIBS=$BUILD_SHARED_LIBS} ..
         - cmake --build . --target install
@@ -227,9 +307,9 @@ install:
 
 script:
   - mkdir __build__ && cd __build__
-  - cmake -DBOOST_ENABLE_CMAKE=1 -DBoost_VERBOSE=ON -DBOOST_INCLUDE_LIBRARIES=${BOOST_INCLUDE_LIBRARIES:-$LIB} ${BUILD_SHARED_LIBS:+-DBUILD_SHARED_LIBS=$BUILD_SHARED_LIBS} ..
-  - cmake --build .
-  - ctest --output-on-failure -R boost_$LIB
+  - cmake -DBOOST_ENABLE_CMAKE=1 -DBUILD_TESTING=ON -DBoost_VERBOSE=ON -DBOOST_INCLUDE_LIBRARIES=${BOOST_INCLUDE_LIBRARIES:-$LIB} ${BUILD_SHARED_LIBS:+-DBUILD_SHARED_LIBS=$BUILD_SHARED_LIBS} ..
+  - cmake --build . --target tests -- -j 3
+  - ctest --output-on-failure -j 3
 
 notifications:
   email:

@@ -7,3 +7,14 @@ inspect.html
 test/cuda
 *.DS_Store
 /**/*.dSYM/
+**/.temps/*
+build/*
+.vscode/*
+
+# CMake Related Options
+*.a
+*.o
+cmake_install.cmake
+CMakeCache.txt
+Makefile
+**/CMakeFiles/**

@@ -22,7 +22,7 @@
 #if defined(__SIZEOF_INT128__) && !defined(_MSC_VER) && !defined(RYU_ONLY_64_BIT_OPS)
 #define BOOST_JSON_RYU_HAS_UINT128
 #elif defined(_MSC_VER) && !defined(RYU_ONLY_64_BIT_OPS) && defined(_M_X64) \
-  && !defined(__clang__) && !defined(_M_ARM64EC) // https://bugs.llvm.org/show_bug.cgi?id=37755
+  && !defined(__clang__) // https://bugs.llvm.org/show_bug.cgi?id=37755
 #define BOOST_JSON_RYU_HAS_64_BIT_INTRINSICS
 #endif
 
@@ -32,6 +32,7 @@
 #endif
 #include <boost/json/detail/ryu/detail/d2s.hpp>
 #include <boost/json/detail/ryu/detail/d2s_full_table.hpp>
+#include <array>
 #include <cstdint>
 #include <cmath>
 #include "gtest.hpp"

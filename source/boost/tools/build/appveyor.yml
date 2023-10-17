@@ -2,12 +2,12 @@
 # subject to the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 #
-# Copyright Rene Rivera 2015-2020.
+# Copyright Rene Ferdinand Rivera Morell 2015-2020.
 
 branches:
   only:
-    - /master.*/
-    - /develop.*/
+    - /main/
+    - /release/
     - /feature\/.*/
 
 environment:
@@ -22,11 +22,18 @@ environment:
     TOOLSET: vc12
     TEST_TOOLSET: msvc
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+  - job_name: 'Cygwin 3.1.7 x64, Test'
+    job_group: 'TestCygwin'
+    TOOLSET: gcc
+    TEST_TOOLSET: gcc
+    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+    B2_CXX_PATH: C:/cygwin64/bin
+    B2_CXX: C:/cygwin64/bin/g++.exe
 
 build_script:
   - cmd: |
       cd src/engine
-      PATH=%PATH%;%CXX_PATH%
+      set PATH=%B2_CXX_PATH%;%PATH%
   - cmd: |
       ./build.bat %TOOLSET%
   - cmd: |
@@ -34,9 +41,9 @@ build_script:
       src\engine\b2.exe -v
 
 before_test:
-  -cmd: |
-      HOME=%HOMEDRIVE%%HOMEPATH%
-      echo "using" %TEST_TOOLSET% ":" ":" %CXX% ";" > "%HOME%/user-config.jam"
+  - cmd: |
+      set HOME=%HOMEDRIVE%%HOMEPATH%
+      echo using %TEST_TOOLSET% : : %B2_CXX% ; > "%HOME%/user-config.jam"
 
 for:
   - matrix:
@@ -55,7 +62,7 @@ for:
           echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
           echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> NO WARNINGS"
           echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-          src\engine\b2.exe --debug-configuration b2 warnings-as-errors=on toolset=%TEST_TOOLSET%
+          src\engine\b2.exe --debug-configuration b2 warnings-as-errors=on variant=debug,release address-model=32,64 toolset=%TEST_TOOLSET%
       - cmd: |
           echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
           echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> BOOTSTRAP"

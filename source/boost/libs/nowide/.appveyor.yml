@@ -147,13 +147,21 @@ for:
     test_script:
       - ctest --output-on-failure -C %configuration% --parallel 4
       - ps: |
+            $iostream_exe = "$env:configuration/boost_nowide-test_iostream.exe"
+            # Should show "Using Nowide input/output" and run the tests
+            &$iostream_exe
+      - ps: |
             If ($env:COVERAGE -eq "true") {
               choco install opencppcoverage
               Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
               OpenCppCoverage.exe --quiet --export_type cobertura:cobertura.xml `
-              --sources ${env:APPVEYOR_BUILD_FOLDER} --modules "$PWD" `
-              --cover_children --working_dir "$PWD" -- ctest -C Debug
-              bash codecov.sh -f cobertura.xml -n Appveyor -e APPVEYOR_BUILD_WORKER_IMAGE -X gcov -X search -Z -U "-s" -A "-s"
+                --sources ${env:APPVEYOR_BUILD_FOLDER} --modules "$PWD" `
+                --cover_children --working_dir "$PWD" -- ctest -C Debug
+              $commit = if ($env:APPVEYOR_PULL_REQUEST_HEAD_COMMIT) { $env:APPVEYOR_PULL_REQUEST_HEAD_COMMIT } else { $env:APPVEYOR_REPO_COMMIT }
+              bash codecov.sh -f cobertura.xml -n Appveyor -e APPVEYOR_BUILD_WORKER_IMAGE `
+                -C $commit `
+                -X gcov -X search -Z `
+                -U "-s" -A "-s"
             }
       # Build consumer example test
       - cmake --build . --config %configuration% --target install
@@ -170,14 +178,14 @@ for:
       - ps: |
             cd "$env:BOOST_ROOT"
             mkdir __build_static | cd
-            cmake -DBOOST_ENABLE_CMAKE=1 -DBoost_VERBOSE=1 -DBOOST_INCLUDE_LIBRARIES=nowide ..
+            cmake -DBOOST_ENABLE_CMAKE=1 -DBoost_VERBOSE=1 -DBOOST_INCLUDE_LIBRARIES=nowide -DBUILD_TESTING=1 ..
             cmake --build . --config Debug --parallel 4
             ctest --output-on-failure --build-config Debug
             cmake --build . --config Release --parallel 4
             ctest --output-on-failure --build-config Release
             cd ..
             mkdir __build_shared | cd
-            cmake -DBOOST_ENABLE_CMAKE=1 -DBoost_VERBOSE=1 -DBUILD_SHARED_LIBS=ON -DBOOST_INCLUDE_LIBRARIES=nowide ..
+            cmake -DBOOST_ENABLE_CMAKE=1 -DBoost_VERBOSE=1 -DBUILD_SHARED_LIBS=ON -DBOOST_INCLUDE_LIBRARIES=nowide -DBUILD_TESTING=1 ..
             cmake --build . --config Debug --parallel 4
             ctest --output-on-failure --build-config Debug
             cmake --build . --config Release --parallel 4

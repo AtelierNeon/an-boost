@@ -199,6 +199,13 @@ static std::string const mysql_report_2015_07_05_5_wi
 class buffer_custom_side_strategy
 {
 public :
+
+    static bool equidistant()
+    {
+        // There is an adapted distance
+        return false;
+    }
+
     template
     <
         typename Point,
@@ -859,7 +866,7 @@ int test_main(int, char* [])
 #endif
 
 #if defined(BOOST_GEOMETRY_TEST_FAILURES)
-    BoostGeometryWriteExpectedFailures(2, 1, 10, 1);
+    BoostGeometryWriteExpectedFailures(2, 1, 9, 1);
 #endif
 
     return 0;

@@ -1,9 +1,13 @@
-# Copyright 2019 - 2020 Alexander Grund
+# Copyright 2019 - 2021 Alexander Grund
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE or copy at http://boost.org/LICENSE_1_0.txt)
 
 include(CheckCXXCompilerFlag)
 check_cxx_compiler_flag(-Wsuggest-override _BOOST_NOWIDE_SUGGEST_OVERRIDE_SUPPORTED)
+
+add_library(boost_nowide_file_test_helpers STATIC file_test_helpers.cpp)
+target_link_libraries(boost_nowide_file_test_helpers PRIVATE PRIVATE Boost::nowide)
+target_compile_definitions(boost_nowide_file_test_helpers PRIVATE BOOST_ALL_NO_LIB)
 
 function(boost_nowide_add_test name)
   cmake_parse_arguments(PARSE_ARGV 1 ARG "COMPILE_ONLY" "SRC" "LIBRARIES;DEFINITIONS;ARGS")
@@ -14,15 +18,11 @@ function(boost_nowide_add_test name)
   
   add_executable(${name} ${ARG_SRC})
   target_link_libraries(${name} PRIVATE Boost::nowide ${ARG_LIBRARIES})
-  if(WIN32)
-    target_link_libraries(${name} PRIVATE Boost::nowide shell32)
-  endif()
   boost_add_warnings(${name} pedantic ${Boost_NOWIDE_WERROR})
   if(_BOOST_NOWIDE_SUGGEST_OVERRIDE_SUPPORTED)
     target_compile_options(${name} PRIVATE -Wsuggest-override -Wno-error=suggest-override)
   endif()
   target_compile_definitions(${name} PRIVATE BOOST_ALL_NO_LIB ${ARG_DEFINITIONS})
-  target_link_options("${name}" PUBLIC $<$<CXX_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
   if(NOT ARG_COMPILE_ONLY)
     add_test(NAME ${name} COMMAND ${name} ${ARG_ARGS})
   endif()
@@ -32,12 +32,13 @@ boost_nowide_add_test(test_codecvt)
 boost_nowide_add_test(test_convert)
 boost_nowide_add_test(test_env)
 boost_nowide_add_test(test_env_win SRC test_env.cpp DEFINITIONS BOOST_NOWIDE_TEST_INCLUDE_WINDOWS)
-boost_nowide_add_test(test_fstream)
-boost_nowide_add_test(test_fstream_cxx11)
-boost_nowide_add_test(test_iostream)
-if(MSVC AND CMAKE_VERSION VERSION_GREATER_EQUAL 3.13)
-  set_target_properties(${PROJECT_NAME}-test_iostream PROPERTIES VS_DEBUGGER_COMMAND_ARGUMENTS -i)
-endif()
+boost_nowide_add_test(test_filebuf LIBRARIES boost_nowide_file_test_helpers)
+boost_nowide_add_test(test_ifstream LIBRARIES boost_nowide_file_test_helpers)
+boost_nowide_add_test(test_ofstream LIBRARIES boost_nowide_file_test_helpers)
+boost_nowide_add_test(test_fstream LIBRARIES boost_nowide_file_test_helpers)
+boost_nowide_add_test(test_fstream_special LIBRARIES boost_nowide_file_test_helpers)
+boost_nowide_add_test(test_iostream LIBRARIES boost_nowide_file_test_helpers)
+boost_nowide_add_test(test_iostream_interactive COMPILE_ONLY SRC test_iostream.cpp DEFINITIONS BOOST_NOWIDE_TEST_INTERACTIVE LIBRARIES boost_nowide_file_test_helpers)
 boost_nowide_add_test(test_stackstring)
 boost_nowide_add_test(test_stat)
 boost_nowide_add_test(test_stdio)
@@ -45,10 +46,20 @@ boost_nowide_add_test(test_system_n SRC test_system.cpp DEFINITIONS BOOST_NOWIDE
 if(WIN32)
   boost_nowide_add_test(test_system_w SRC test_system.cpp DEFINITIONS BOOST_NOWIDE_TEST_USE_NARROW=0)
 else()
-  boost_nowide_add_test(test_internal_fstream SRC test_fstream.cpp DEFINITIONS BOOST_NOWIDE_USE_FILEBUF_REPLACEMENT=1)
-  boost_nowide_add_test(test_internal_fstream_cxx11 SRC test_fstream_cxx11.cpp DEFINITIONS BOOST_NOWIDE_USE_FILEBUF_REPLACEMENT=1)
+  foreach(test test_filebuf test_ifstream test_ofstream test_fstream test_fstream_special)
+    boost_nowide_add_test(${test}_internal SRC ${test}.cpp DEFINITIONS BOOST_NOWIDE_USE_FILEBUF_REPLACEMENT=1 LIBRARIES boost_nowide_file_test_helpers)
+  endforeach()
 endif()
 boost_nowide_add_test(test_traits)
+
+# Test that passthrough writes everything from stdin to stdout
+# Needs to be done with CMake as the test driver to write any input to stdin and check output
+add_test(
+  NAME ${PROJECT_NAME}-test_iostream_passthrough
+  COMMAND ${CMAKE_COMMAND}
+    -D TEST_BINARY=$<TARGET_FILE:${PROJECT_NAME}-test_iostream>
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/test_iostream_passthrough.cmake
+)
 
 if(NOT BOOST_SUPERPROJECT_SOURCE_DIR)
   find_package(Boost 1.56 REQUIRED COMPONENTS filesystem system)

@@ -8,7 +8,7 @@
  *  Copyright 2001-2004 David Abrahams.
  *  Copyright 2005 Rene Rivera.
  *  Distributed under the Boost Software License, Version 1.0.
- *  (See accompanying file LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt)
+ *  (See accompanying file LICENSE.txt or https://www.bfgroup.xyz/b2/LICENSE.txt)
  */
 
 /*
@@ -307,7 +307,7 @@ int file_collect_archive_content_( file_archive_info_t * const archive )
         char * src;
         char * dest;
 
-        size_t ar_hdr_name_size = sizeof( ar_hdr.ar_name ); // Workaround for sizeof strncpy warning.
+        int32_t ar_hdr_name_size = sizeof( ar_hdr.ar_name ); // Workaround for sizeof strncpy warning.
         strncpy( lar_name, ar_hdr.ar_name, ar_hdr_name_size );
 
         sscanf( ar_hdr.ar_date, "%ld", &lar_date );
